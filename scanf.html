@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<!-- saved from url=(0033)https://linux.die.net/man/3/scanf -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>scanf(3): input format conversion - Linux man page</title>
+<!--<base href="https://linux.die.net/man/3/scanf">--><base href=".">
+<link rel="canonical" href="https://linux.die.net/man/3/scanf">
+<link rel="stylesheet" type="text/css" href="./scanf_files/white.css">
+<link rel="shortcut icon" href="https://linux.die.net/favicon.ico" type="image/x-icon">
+<link href="https://linux.die.net/style/search.xml" rel="search" title="Search the die.net site" type="application/opensearchdescription+xml">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="The scanf() family of functions scans input according to format as described below. This format may contain conversion specifications; the results from ...">
+<script type="text/javascript" async="" src="./scanf_files/ga.js"></script><script type="text/javascript">
+<!--
+var _gaq = _gaq || [];_gaq.push(['_setAccount', 'UA-50820-6']);_gaq.push(['_trackPageview']);
+window.google_analytics_uacct = 'UA-50820-6';
+// -->
+</script>
+</head>
+
+<body>
+<div id="bg">
+<div id="logo">
+<a href="https://www.die.net/"><img src="./scanf_files/logo.svg" alt="die.net" width="120" height="120" onerror="this.onerror=null; this.src=&#39;/style/logo.png&#39;"></a>
+</div>
+<div id="content">
+
+<!-- google_ad_section_start -->
+<h1>scanf(3) - Linux man page</h1>
+
+<h2>Name</h2>
+
+<p>scanf, fscanf, sscanf, vscanf, vsscanf, vfscanf - input format conversion
+</p><h2>Synopsis</h2>
+
+<pre class="code"><b>#include &lt;<a href="https://linux.die.net/include/stdio.h" rel="nofollow">stdio.h</a>&gt;
+
+int scanf(const char *</b><i>format</i><b>, ...);
+int fscanf(FILE *</b><i>stream</i><b>, const char *</b><i>format</i><b>, ...);
+int sscanf(const char *</b><i>str</i><b>, const char *</b><i>format</i><b>, ...);
+
+#include &lt;stdarg.h&gt;
+
+int vscanf(const char *</b><i>format</i><b>, va_list</b> <i>ap</i><b>);
+int vsscanf(const char *</b><i>str</i><b>, const char *</b><i>format</i><b>, va_list</b> <i>ap</i><b>);
+int vfscanf(FILE *</b><i>stream</i><b>, const char *</b><i>format</i><b>, va_list</b> <i>ap</i><b>);
+</b></pre>Feature Test Macro Requirements for glibc (see <b><a href="https://linux.die.net/man/7/feature_test_macros">feature_test_macros</a></b>(7)):
+<dl compact="">
+<dt><b>vscanf</b>(), <b>vsscanf</b>(), <b>vfscanf</b>():
+</dt><dd>_XOPEN_SOURCE &gt;= 600 || _ISOC99_SOURCE || _POSIX_C_SOURCE &gt;= 200112L;<br>
+or <i>cc -std=c99</i>
+</dd></dl>
+<h2>Description</h2>
+<div id="adright">
+<script async="" src="./scanf_files/f.txt"></script>
+<ins class="adsbygoogle" style="display:inline-block;width:336px;height:280px" data-ad-client="ca-pub-5823754184406795" data-ad-slot="7130739364"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</div>
+
+
+<p>The <b>scanf</b>() family of functions scans input according to <i>format</i> as described below. This format may contain <i>conversion specifications</i>;
+the results from such conversions, if any, are stored in the locations pointed to by the <i>pointer</i> arguments that follow <i>format</i>. Each
+<i>pointer</i> argument must be of a type that is appropriate for the value returned by the corresponding conversion specification.
+</p><p>If the number of conversion specifications in <i>format</i> exceeds the number of <i>pointer</i> arguments, the results are undefined. If the number of
+<i>pointer</i> arguments exceeds the number of conversion specifications, then the excess <i>pointer</i> arguments are evaluated, but are otherwise ignored.
+
+</p><p>The <b>scanf</b>() function reads input from the standard input stream <i>stdin</i>, <b>fscanf</b>() reads input from the stream pointer <i>stream</i>, and
+<b>sscanf</b>() reads its input from the character string pointed to by <i>str</i>.
+</p><p>The <b>vfscanf</b>() function is analogous to <b><a href="https://linux.die.net/man/3/vfprintf">vfprintf</a></b>(3) and reads input from the stream pointer <i>stream</i> using a variable argument list of
+pointers (see <b><a href="https://linux.die.net/man/3/stdarg">stdarg</a></b>(3). The <b>vscanf</b>() function scans a variable argument list from the standard input and the <b>vsscanf</b>() function scans it
+from a string; these are analogous to the <b><a href="https://linux.die.net/man/3/vprintf">vprintf</a></b>(3) and <b><a href="https://linux.die.net/man/3/vsprintf">vsprintf</a></b>(3) functions respectively.
+</p><p>The <i>format</i> string consists of a sequence of <i>directives</i> which describe how to process the sequence of input characters. If processing of a
+directive fails, no further input is read, and <b>scanf</b>() returns. A "failure" can be either of the following: <i>input failure</i>, meaning that input
+characters were unavailable, or <i>matching failure</i>, meaning that the input was inappropriate (see below).
+</p><p>A directive is one of the following:
+</p><dl compact="">
+<dt>• A sequence of white-space characters (space, tab, newline, etc.; see <b><a href="https://linux.die.net/man/3/isspace">isspace</a></b>(3)). This directive matches any amount of white space, including none,
+in the input.
+
+<p>• An ordinary character (i.e., one other than white space or '%'). This character must exactly match the next character of input.
+
+</p><p>• A conversion specification, which commences with a '%' (percent) character. A sequence of characters from the input is converted according to this
+specification, and the result is placed in the corresponding <i>pointer</i> argument. If the next item of input does not match the conversion specification,
+the conversion fails-this is a <i>matching failure</i>.
+</p></dt><dt>Each <i>conversion specification</i> in <i>format</i> begins with either the character '%' or the character sequence "<b>%</b><i>n</i><b>$</b>" (see below
+for the distinction) followed by:
+</dt><dt>• An optional '*' assignment-suppression character: <b>scanf</b>() reads input as directed by the conversion specification, but discards the input. No
+corresponding <i>pointer</i> argument is required, and this specification is not included in the count of successful assignments returned by <b>scanf</b>().
+
+<p>• An optional 'm' character. This is used with string conversions (<i>%s</i>, <i>%c</i>, <i>%[</i>), and relieves the caller of the need to allocate a
+corresponding buffer to hold the input: instead, <b>scanf</b>() allocates a buffer of sufficient size, and assigns the address of this buffer to the
+corresponding <i>pointer</i> argument, which should be a pointer to a <i>char *</i> variable (this variable does not need to be initialized before the call).
+The caller should subsequently <b><a href="https://linux.die.net/man/3/free">free</a></b>(3) this buffer when it is no longer required.
+
+</p><p>• An optional decimal integer which specifies the <i>maximum field width</i>. Reading of characters stops either when this maximum is reached or when a
+nonmatching character is found, whichever happens first. Most conversions discard initial white space characters (the exceptions are noted below), and these
+discarded characters don't count toward the maximum field width. String input conversions store a terminating null byte ('\0') to mark the end of the input;
+the maximum field width does not include this terminator.
+
+</p><p>• An optional <i>type modifier character</i>. For example, the <b>l</b> type modifier is used with integer conversions such as <b>%d</b> to specify that the
+corresponding <i>pointer</i> argument refers to a <i>long int</i> rather than a pointer to an <i>int</i>.
+
+</p><p>• A <i>conversion specifier</i> that specifies the type of input conversion to be performed.
+</p></dt><dt>The conversion specifications in <i>format</i> are of two forms, either beginning with '%' or beginning with "<b>%</b><i>n</i><b>$</b>". The two forms
+should not be mixed in the same <i>format</i> string, except that a string containing "<b>%</b><i>n</i><b>$</b>" specifications can include <b>%%</b> and
+<b>%*</b>. If <i>format</i> contains '%' specifications then these correspond in order with successive <i>pointer</i> arguments. In the
+"<b>%</b><i>n</i><b>$</b>" form (which is specified in POSIX.1-2001, but not C99), <i>n</i> is a decimal integer that specifies that the converted input should
+be placed in the location referred to by the <i>n</i>-th <i>pointer</i> argument following <i>format</i>.
+</dt></dl>
+
+<p><b>Conversions</b>
+</p><dl compact="">
+<dt>The following <i>type modifier characters</i> can appear in a conversion specification:
+</dt><dt><b>h</b>
+
+<p>Indicates that the conversion will be one of <b>d</b>, <b>i</b>, <b>o</b>, <b>u</b>, <b>x</b>, <b>X</b>, or <b>n</b> and the next pointer is a pointer to a
+<i>short int</i> or <i>unsigned short int</i> (rather than <i>int</i>).
+
+</p><p><b>hh</b>
+
+</p><p>As for <b>h</b>, but the next pointer is a pointer to a <i>signed char</i> or <i>unsigned char</i>.
+
+</p><p><b>j</b>
+
+</p><p>As for <b>h</b>, but the next pointer is a pointer to an <i>intmax_t</i> or a <i>uintmax_t</i>. This modifier was introduced in C99.
+
+</p><p><b>l</b>
+
+</p><p>Indicates either that the conversion will be one of <b>d</b>, <b>i</b>, <b>o</b>, <b>u</b>, <b>x</b>, <b>X</b>, or <b>n</b> and the next pointer is a
+pointer to a <i>long int</i> or <i>unsigned long int</i> (rather than <i>int</i>), or that the conversion will be one of <b>e</b>, <b>f</b>, or <b>g</b> and
+the next pointer is a pointer to <i>double</i> (rather than <i>float</i>). Specifying two <b>l</b> characters is equivalent to <b>L</b>. If used with <b>%c</b>
+or <b>%s</b> the corresponding parameter is considered as a pointer to a wide character or wide-character string respectively.
+
+</p><p><b>L</b>
+
+</p><p>Indicates that the conversion will be either <b>e</b>, <b>f</b>, or <b>g</b> and the next pointer is a pointer to <i>long double</i> or the conversion will
+be <b>d</b>, <b>i</b>, <b>o</b>, <b>u</b>, or <b>x</b> and the next pointer is a pointer to <i>long long</i>.
+
+</p><p><b>q</b>
+
+</p><p>equivalent to <b>L</b>. This specifier does not exist in ANSI C.
+
+</p><p><b>t</b>
+
+</p><p>As for <b>h</b>, but the next pointer is a pointer to a <i>ptrdiff_t</i>. This modifier was introduced in C99.
+
+</p><p><b>z</b>
+
+</p><p>As for <b>h</b>, but the next pointer is a pointer to a <i>size_t</i>. This modifier was introduced in C99.
+</p></dt><dt>The following <i>conversion specifiers</i> are available:
+</dt><dt><b>%</b>
+
+<p>Matches a literal '%'. That is, <b>%%</b> in the format string matches a single input '%' character. No conversion is done (but initial white space
+characters are discarded), and assignment does not occur.
+
+</p><p><b>d</b>
+
+</p><p>Matches an optionally signed decimal integer; the next pointer must be a pointer to <i>int</i>.
+
+</p><p><b>D</b>
+
+</p><p>Equivalent to <i>ld</i>; this exists only for backward compatibility. (Note: thus only in libc4. In libc5 and glibc the <b>%D</b> is silently ignored,
+causing old programs to fail mysteriously.)
+
+</p><p><b>i</b>
+
+</p><p>Matches an optionally signed integer; the next pointer must be a pointer to <i>int</i>. The integer is read in base 16 if it begins with <i>0x</i> or
+<i>0X</i>, in base 8 if it begins with <i>0</i>, and in base 10 otherwise. Only characters that correspond to the base are used.
+
+</p><p><b>o</b>
+
+</p><p>Matches an unsigned octal integer; the next pointer must be a pointer to <i>unsigned int</i>.
+
+</p><p><b>u</b>
+
+</p><p>Matches an unsigned decimal integer; the next pointer must be a pointer to <i>unsigned int</i>.
+
+</p><p><b>x</b>
+
+</p><p>Matches an unsigned hexadecimal integer; the next pointer must be a pointer to <i>unsigned int</i>.
+
+</p><p><b>X</b>
+
+</p><p>Equivalent to <b>x</b>.
+
+</p><p><b>f</b>
+
+</p><p>Matches an optionally signed floating-point number; the next pointer must be a pointer to <i>float</i>.
+
+</p><p><b>e</b>
+
+</p><p>Equivalent to <b>f</b>.
+
+</p><p><b>g</b>
+
+</p><p>Equivalent to <b>f</b>.
+
+</p><p><b>E</b>
+
+</p><p>Equivalent to <b>f</b>.
+
+</p><p><b>a</b>
+
+</p><p>(C99) Equivalent to <b>f</b>.
+
+</p><p><b>s</b>
+
+</p><p>Matches a sequence of non-white-space characters; the next pointer must be a pointer to character array that is long enough to hold the input sequence and
+the terminating null byte ('\0'), which is added automatically. The input string stops at white space or at the maximum field width, whichever occurs first.
+
+</p><p><b>c</b>
+
+</p><p>Matches a sequence of characters whose length is specified by the <i>maximum field width</i> (default 1); the next pointer must be a pointer to <i>char</i>,
+and there must be enough room for all the characters (no terminating null byte is added). The usual skip of leading white space is suppressed. To skip white
+space first, use an explicit space in the format.
+
+</p><p><b>[</b>
+
+</p><p>Matches a nonempty sequence of characters from the specified set of accepted characters; the next pointer must be a pointer to <i>char</i>, and there must
+be enough room for all the characters in the string, plus a terminating null byte. The usual skip of leading white space is suppressed. The string is to be
+made up of characters in (or not in) a particular set; the set is defined by the characters between the open bracket <b>[</b> character and a close bracket
+<b>]</b> character. The set <i>excludes</i> those characters if the first character after the open bracket is a circumflex (<b>^</b>). To include a close
+bracket in the set, make it the first character after the open bracket or the circumflex; any other position will end the set. The hyphen character <b>-</b> is
+also special; when placed between two other characters, it adds all intervening characters to the set. To include a hyphen, make it the last character before
+the final close bracket. For instance, <b>[^]0-9-]</b> means the set "everything except close bracket, zero through nine, and hyphen". The string ends with the
+appearance of a character not in the (or, with a circumflex, in) set or when the field width runs out.
+
+</p><p><b>p</b>
+
+</p><p>Matches a pointer value (as printed by <b>%p</b> in <b><a href="https://linux.die.net/man/3/printf">printf</a></b>(3); the next pointer must be a pointer to a pointer to <i>void</i>.
+
+</p><p><b>n</b>
+
+</p><p>Nothing is expected; instead, the number of characters consumed thus far from the input is stored through the next pointer, which must be a pointer to
+<i>int</i>. This is <i>not</i> a conversion, although it can be suppressed with the <b>*</b> assignment-suppression character. The C standard says: "Execution
+of a <b>%n</b> directive does not increment the assignment count returned at the completion of execution" but the Corrigendum seems to contradict this.
+Probably it is wise not to make any assumptions on the effect of <b>%n</b> conversions on the return value.
+</p></dt></dl>
+<h2>Return Value</h2>
+
+<p>These functions return the number of input items successfully matched and assigned, which can be fewer than provided for, or even zero in the event of an
+early matching failure.
+</p><p>The value <b>EOF</b> is returned if the end of input is reached before either the first successful conversion or a matching failure occurs. <b>EOF</b> is
+also returned if a read error occurs, in which case the error indicator for the stream (see <b><a href="https://linux.die.net/man/3/ferror">ferror</a></b>(3)) is set, and <i>errno</i> is set indicate the
+error.
+</p><h2>Errors</h2>
+<dl compact="">
+<dt><b>EAGAIN</b>
+
+<p>The file descriptor underlying <i>stream</i> is marked nonblocking, and the read operation would block.
+
+</p><p><b>EBADF</b>
+
+</p><p>The file descriptor underlying <i>stream</i> is invalid, or not open for reading.
+
+</p><p><b>EILSEQ</b>
+
+</p><p>Input byte sequence does not form a valid character.
+
+</p><p><b>EINTR</b>
+
+</p><p>The read operation was interrupted by a signal; see <b><a href="https://linux.die.net/man/7/signal">signal</a></b>(7).
+
+</p><p><b>EINVAL</b>
+
+</p><p>Not enough arguments; or <i>format</i> is NULL.
+
+</p><p><b>ENOMEM</b>
+
+</p><p>Out of memory.
+
+</p><p><b>ERANGE</b>
+
+</p><p>The result of an integer conversion would exceed the size that can be stored in the corresponding integer type.
+</p></dt></dl>
+<h2>Conforming To</h2>
+
+<p>The functions <b>fscanf</b>(), <b>scanf</b>(), and <b>sscanf</b>() conform to C89 and C99 and POSIX.1-2001. These standards do not specify the <b>ERANGE</b>
+error.
+</p><p>The <b>q</b> specifier is the 4.4BSD notation for <i>long long</i>, while <b>ll</b> or the usage of <b>L</b> in integer conversions is the GNU notation.
+
+</p><p>The Linux version of these functions is based on the <i>GNU libio</i> library. Take a look at the <i>info</i> documentation of <i>GNU libc (glibc-1.08)</i>
+for a more concise description.
+</p><h2>Notes</h2>
+
+<p>The GNU C library supported the dynamic allocation conversion specifier (as a nonstandard extension) via the <b>a</b> character. This feature seems to be
+present at least as far back as glibc 2.0.
+</p><p>It is not available if the program is compiled with <i>gcc -std=c99</i> or <i>gcc -D_ISOC99_SOURCE</i> (unless <b>_GNU_SOURCE</b> is also specified), in
+which case the <b>a</b> is interpreted as a specifier for floating-point numbers (see above).
+</p><p>Since version 2.7, glibc also provides the <b>m</b> modifier for the same purpose as the <b>a</b> modifier. The <b>m</b> modifier has the following
+advantages:
+</p><dl compact="">
+<dt>*
+
+<p>It may also be applied to <b>%c</b> conversion specifiers (e.g., <b>%3mc</b>).
+
+</p><p>*
+
+</p><p>It avoids ambiguity with respect to the <b>%a</b> floating-point conversion specifier (and is unaffected by <i>gcc -std=c99</i> etc.)
+
+</p><p>*
+
+</p><p>It is specified in the POSIX.1-2008 standard.
+</p></dt></dl>
+<h2>Bugs</h2>
+
+<p>All functions are fully C89 conformant, but provide the additional specifiers <b>q</b> and <b>a</b> as well as an additional behavior of the <b>L</b> and
+<b>l</b> specifiers. The latter may be considered to be a bug, as it changes the behavior of specifiers defined in C89.
+</p><p>Some combinations of the type modifiers and conversion specifiers defined by ANSI C do not make sense (e.g., <b>%Ld</b>). While they may have a well-defined
+behavior on Linux, this need not to be so on other architectures. Therefore it usually is better to use modifiers that are not defined by ANSI C at all, that
+is, use <b>q</b> instead of <b>L</b> in combination with <b>d</b>, <b>i</b>, <b>o</b>, <b>u</b>, <b>x</b>, and <b>X</b> conversions or <b>ll</b>.
+
+</p><p>The usage of <b>q</b> is not the same as on 4.4BSD, as it may be used in float conversions equivalently to <b>L</b>.
+</p><h2>Example</h2>
+
+<p>To use the dynamic allocation conversion specifier, specify <b>m</b> as a length modifier (thus <b>%ms</b> or <b>%m[</b><i>range</i><b>]</b>). The caller
+must <b><a href="https://linux.die.net/man/3/free" rel="nofollow">free</a></b>(3) the returned string, as in the following example:
+</p><dl compact="">
+<dd>
+
+<pre class="code">char *p;
+int n;
+
+errno = 0;
+n = scanf("%m[a-z]", &amp;p);
+if (n == 1) {
+    printf("read: %s\n", p);
+    <b>free</b>(p);
+} else if (errno != 0) {
+    perror("scanf");
+} else {
+    fprintf(stderr, "No matching characters\n");
+}</pre>
+</dd><dt>As shown in the above example, it is only necessary to call <b><a href="https://linux.die.net/man/3/free" rel="nofollow">free</a></b>(3) if the <b>scanf</b>() call successfully read a string.
+</dt></dl>
+<h2>See Also</h2>
+
+<p><b><a href="https://linux.die.net/man/3/getc">getc</a></b>(3), <b><a href="https://linux.die.net/man/3/printf" rel="nofollow">printf</a></b>(3), <b><a href="https://linux.die.net/man/3/setlocale">setlocale</a></b>(3), <b><a href="https://linux.die.net/man/3/strtod">strtod</a></b>(3), <b><a href="https://linux.die.net/man/3/strtol">strtol</a></b>(3), <b><a href="https://linux.die.net/man/3/strtoul">strtoul</a></b>(3)
+
+<!-- google_ad_section_end -->
+</p><h2>Referenced By</h2>
+<b><a href="https://linux.die.net/man/3/fgets" rel="nofollow">fgets</a></b>(3),
+<b><a href="https://linux.die.net/man/3/getline" rel="nofollow">getline</a></b>(3),
+<b><a href="https://linux.die.net/man/1/gvpr" rel="nofollow">gvpr</a></b>(1),
+<b><a href="https://linux.die.net/man/3/lber-decode" rel="nofollow">lber-decode</a></b>(3),
+<b><a href="https://linux.die.net/man/7/locale" rel="nofollow">locale</a></b>(7),
+<b><a href="https://linux.die.net/man/1/mcedit" rel="nofollow">mcedit</a></b>(1),
+<b><a href="https://linux.die.net/man/5/proc" rel="nofollow">proc</a></b>(5),
+<b><a href="https://linux.die.net/man/3/putc" rel="nofollow">putc</a></b>(3),
+<b><a href="https://linux.die.net/man/3/strptime" rel="nofollow">strptime</a></b>(3),
+<b><a href="https://linux.die.net/man/3/wscanw" rel="nofollow">wscanw</a></b>(3)
+<div id="adbottom">
+<script async="" src="./scanf_files/f.txt"></script>
+<ins class="adsbygoogle" style="display:inline-block;width:336px;height:280px" data-ad-client="ca-pub-5823754184406795" data-ad-slot="8789940313"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</div>
+
+</div>
+<div id="menu">
+<dl>
+<dt>Site Search</dt>
+<dd>
+<form id="cse-search-box-menu" action="https://www.die.net/search/">
+<input name="q" type="text" size="10">
+<input type="hidden" name="sa" value="Search">
+<input type="hidden" name="ie" value="ISO-8859-1">
+<input type="hidden" name="cx" value="partner-pub-5823754184406795:54htp1rtx5u">
+<input type="hidden" name="cof" value="FORID:9">
+</form>
+<script type="text/javascript">
+<!--
+document.forms["cse-search-box-menu"].action = "https://www.die.net/search/";
+// -->
+</script>
+</dd></dl>
+
+
+
+<dl>
+<dt>Library</dt>
+<dd><a href="https://linux.die.net/">linux docs</a></dd>
+<dd><a href="https://linux.die.net/man/">linux man pages</a></dd>
+<dd><a href="https://www.die.net/musings/page_load_time/">page load time</a></dd>
+</dl>
+<dl>
+<dt>Toys</dt>
+<dd><a href="https://www.die.net/earth/">world sunlight</a></dd>
+<dd><a href="https://www.die.net/moon/">moon phase</a></dd>
+<dd><a href="http://trace.die.net/">trace explorer</a></dd>
+</dl>
+
+
+<dl>
+<dt><a href="https://linux.die.net/man/3/"><img src="./scanf_files/back.gif" alt="Back" width="20" height="22"></a></dt><dd></dd>
+</dl>
+</div></div>
+<script type="text/javascript">
+<!--
+if (top.location != self.location) top.location = self.location;
+if (/[?&][pq]=/.test(document.referrer)) document.write(unescape("%3Cscript src='/style/highlight.js' type='text/javascript'%3E%3C/script%3E"));
+function googleTranslateElementInit() {new google.translate.TranslateElement({pageLanguage: 'en', floatPosition: google.translate.TranslateElement.FloatPosition.TOP_RIGHT, gaTrack: true, gaId: 'UA-50820-6'});}
+if (!/^en/i.test(window.navigator.userLanguage||window.navigator.language)) document.write(unescape("%3Cscript src='//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit' type='text/javascript'%3E%3C/script%3E"));
+(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+// -->
+</script>
+
+
+</body></html>
